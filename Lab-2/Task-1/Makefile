@@ -7,7 +7,10 @@ generator: crc generator.cpp
 verifier: crc verifier.cpp
 	g++ verifier.cpp crc.cpp -o verifier
 
-all: crc generator verifier
+alter: alter.cpp
+	g++ alter.cpp -o alter
+
+all: crc generator verifier alter
 
 clean:
-	rm generator crc verifier
+	rm generator crc verifier alter
