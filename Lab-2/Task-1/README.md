@@ -9,10 +9,10 @@ Implement an error detection mechanism using the standard CRC algorithm. Write t
 
 1. Install `make` and run `make all`. If you haven't installed make then do the following:
 	```
-	g++ -c crc.cpp -o crc
-	g++ generator.cpp crc.cpp -o generator
-	g++ verifier.cpp crc.cpp -o verifier
-	g++ alter.cpp -o alter
+	g++ -c src/crc.cpp -o crc
+	g++ src/generator.cpp src/crc.cpp -o generator
+	g++ src/verifier.cpp src/crc.cpp -o verifier
+	g++ src/alter.cpp -o alter
 	```
 
 2. Run using `./generator | ./verifier` or `./generator | ./alter <index> | ./verifier`
