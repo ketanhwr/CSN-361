@@ -1,14 +1,14 @@
-crc: crc.h crc.cpp
-	g++ -c crc.cpp -o crc
+crc: src/crc.h src/crc.cpp
+	g++ -c src/crc.cpp -o crc
 
-generator: crc generator.cpp
-	g++ generator.cpp crc.cpp -o generator
+generator: crc src/generator.cpp
+	g++ src/generator.cpp src/crc.cpp -o generator
 
-verifier: crc verifier.cpp
-	g++ verifier.cpp crc.cpp -o verifier
+verifier: crc src/verifier.cpp
+	g++ src/verifier.cpp src/crc.cpp -o verifier
 
-alter: alter.cpp
-	g++ alter.cpp -o alter
+alter: src/alter.cpp
+	g++ src/alter.cpp -o alter
 
 all: crc generator verifier alter
 
