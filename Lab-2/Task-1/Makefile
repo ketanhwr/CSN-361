@@ -1,6 +1,10 @@
-generator: generator.cpp
-	g++ generator.cpp -o generator
+crc: crc.cpp
+	g++ -c crc.cpp -o crc
 
-all: generator
+generator: crc
+	g++ generator.cpp crc.cpp -o generator
 
-clean: rm generator
+all: crc generator
+
+clean:
+	rm generator crc
