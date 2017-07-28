@@ -1,11 +1,11 @@
 crc: src/crc.h src/crc.cpp
-	g++ -c src/crc.cpp -o crc
+	g++ -c src/crc.cpp -o crc.o
 
 generator: crc src/generator.cpp
-	g++ src/generator.cpp src/crc.cpp -o generator
+	g++ src/generator.cpp crc.o -o generator
 
 verifier: crc src/verifier.cpp
-	g++ src/verifier.cpp src/crc.cpp -o verifier
+	g++ src/verifier.cpp crc.o -o verifier
 
 alter: src/alter.cpp
 	g++ src/alter.cpp -o alter
@@ -13,4 +13,4 @@ alter: src/alter.cpp
 all: crc generator verifier alter
 
 clean:
-	rm generator crc verifier alter
+	rm generator crc.o verifier alter
