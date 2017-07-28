@@ -13,6 +13,8 @@ public:
 
 	string generate(string message) const;
 
+	bool verify(string message) const;
+
 private:
 	string mPolynomial;
 };
