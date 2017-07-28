@@ -4,3 +4,15 @@ Implement an error detection mechanism using the standard CRC algorithm. Write t
 
 - `generator < file | verifier`
 - `generator < file | alter arg | verifier`
+
+### Running
+
+1. Install `make`. If you haven't installed make then do the following:
+	```
+	g++ -c crc.cpp -o crc
+	g++ generator.cpp crc.cpp -o generator
+	g++ verifier.cpp crc.cpp -o verifier
+	g++ alter.cpp -o alter
+	```
+
+2. Run using `./generator | ./verifier` or `./generator | ./alter <index> | ./verifier`
