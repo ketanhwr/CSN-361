@@ -7,7 +7,7 @@ Implement an error detection mechanism using the standard CRC algorithm. Write t
 
 ### Running
 
-1. Install `make`. If you haven't installed make then do the following:
+1. Install `make` and run `make all`. If you haven't installed make then do the following:
 	```
 	g++ -c crc.cpp -o crc
 	g++ generator.cpp crc.cpp -o generator
