@@ -43,15 +43,15 @@ int main()
     size = sizeof(server_addr);
     cout << "=> Looking for clients..." << endl;
 
-    listen(client, 1);
-
-    int clientCount = 1;
+    listen(client, 5);
 
     while (server = accept(client,(struct sockaddr *)&server_addr,&size)) 
     {
+        if (fork())
+            continue;
         strcpy(buffer, "=> Server connected...\n");
         send(server, buffer, bufsize, 0);
-        cout << "=> Connected with the client #" << clientCount << ", you are good to go..." << endl;
+        cout << "=> Connected with the client!" << endl;
         cout << "\n=> Enter # to end the connection\n" << endl;
 
         cout << "Client: ";
