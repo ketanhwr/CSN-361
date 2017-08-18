@@ -52,7 +52,7 @@ int main()
         strcpy(buffer, "=> Server connected...\n");
         send(server, buffer, bufsize, 0);
         cout << "=> Connected with the client!" << endl;
-        cout << "\n=> Enter # to end the connection\n" << endl;
+        cout << "\n=> Enter '\\exit' to end the connection\n" << endl;
 
         cout << "Client: ";
         recv(server, buffer, bufsize, 0);

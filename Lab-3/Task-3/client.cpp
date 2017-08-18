@@ -41,7 +41,7 @@ int main()
     recv(client, buffer, bufsize, 0);
     cout << "=> Connection confirmed, you are good to go...";
 
-    cout << "\n\n=> Enter # to end the connection\n" << endl;
+    cout << "\n\n=> Enter '\\exit' to end the connection\n" << endl;
 
     do {
         cout << "Client: ";
