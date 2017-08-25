@@ -10,6 +10,7 @@
 #include <pthread.h>
 
 #define MAX_CLIENTS 10
+#define MAX_ROOM_SIZE 3
 
 typedef enum
 {
@@ -17,6 +18,7 @@ typedef enum
   DISCONNECT,
   GET_USERS,
   SET_USERNAME,
+  SET_ROOM,
   PUBLIC_MESSAGE,
   PRIVATE_MESSAGE,
   TOO_FULL,
@@ -30,6 +32,7 @@ typedef struct
 {
   message_type type;
   char username[21];
+  char room[21];
   char data[256];
 
 } message;
@@ -40,6 +43,7 @@ typedef struct connection_info
   int socket;
   struct sockaddr_in address;
   char username[20];
+  char room[20];
 } connection_info;
 
 
@@ -88,11 +92,12 @@ void initialize_server(connection_info *server_info, int port)
   printf("Waiting for incoming connections...\n");
 }
 
-void send_public_message(connection_info clients[], int sender, char *message_text)
+void send_public_message(connection_info clients[], int sender, char *message_text, char *room)
 {
   message msg;
   msg.type = PUBLIC_MESSAGE;
   strncpy(msg.username, clients[sender].username, 20);
+  strncpy(msg.room, room, 20);
   strncpy(msg.data, message_text, 256);
   int i = 0;
   for(i = 0; i < MAX_CLIENTS; i++)
@@ -147,6 +152,7 @@ void send_connect_message(connection_info *clients, int sender)
   message msg;
   msg.type = CONNECT;
   strncpy(msg.username, clients[sender].username, 21);
+  strncpy(msg.room, clients[sender].room, 21);
   int i = 0;
   for(i = 0; i < MAX_CLIENTS; i++)
   {
@@ -271,13 +277,38 @@ void handle_client_message(connection_info clients[], int sender)
           }
         }
 
+      strcpy(clients[sender].username, msg.username);
+      printf("User connected: %s\n", clients[sender].username);
+      send_connect_message(clients, sender);
+
+      break;
+
+      case SET_ROOM: ;
+        int j;
+        int cnt = 0;
+        for(j = 0; j < MAX_CLIENTS; j++)
+        {
+          if(clients[j].socket != 0 && strcmp(clients[j].room, msg.room) == 0)
+          {
+            cnt++;
+          }
+        }
+
+        if (cnt > MAX_ROOM_SIZE - 1)
+        {
+          close(clients[sender].socket);
+          clients[sender].socket = 0;
+          return;
+        }
+
         strcpy(clients[sender].username, msg.username);
+        strcpy(clients[sender].room, msg.room);
         printf("User connected: %s\n", clients[sender].username);
         send_connect_message(clients, sender);
       break;
 
       case PUBLIC_MESSAGE:
-        send_public_message(clients, sender, msg.data);
+        send_public_message(clients, sender, msg.data, msg.room);
       break;
 
       case PRIVATE_MESSAGE:

@@ -21,6 +21,7 @@ typedef enum
   DISCONNECT,
   GET_USERS,
   SET_USERNAME,
+  SET_ROOM,
   PUBLIC_MESSAGE,
   PRIVATE_MESSAGE,
   TOO_FULL,
@@ -36,6 +37,7 @@ typedef struct
 {
   message_type type;
   char username[21];
+  char room[21];
   char data[256];
 
 } message;
@@ -46,6 +48,7 @@ typedef struct connection_info
   int socket;
   struct sockaddr_in address;
   char username[20];
+  char room[20];
 } connection_info;
 
 void trim_newline(char *text)
@@ -84,6 +87,42 @@ void set_username(connection_info *connection)
   message msg;
   msg.type = SET_USERNAME;
   strncpy(msg.username, connection->username, 20);
+
+  if(send(connection->socket, (void*)&msg, sizeof(msg), 0) < 0)
+  {
+    perror("Send failed");
+    exit(1);
+  }
+}
+
+void get_room(char *room)
+{
+  while(true)
+  {
+    printf("Enter a room: ");
+    fflush(stdout);
+    memset(room, 0, 1000);
+    fgets(room, 22, stdin);
+    trim_newline(room);
+
+    if(strlen(room) > 20)
+    {
+
+      puts("Room must be 20 characters or less.");
+
+    } else {
+      break;
+    }
+  }
+}
+
+
+void set_room(connection_info *connection)
+{
+  message msg;
+  msg.type = SET_ROOM;
+  strncpy(msg.username, connection->username, 20);
+  strncpy(msg.room, connection->room, 20);
 
   if(send(connection->socket, (void*)&msg, sizeof(msg), 0) < 0)
   {
@@ -141,6 +180,45 @@ void connect_to_server(connection_info *connection, char *address, char *port)
     break;
   }
 
+  while(true)
+  {
+    get_room(connection->room);
+
+
+    if ((connection->socket = socket(AF_INET, SOCK_STREAM , IPPROTO_TCP)) < 0)
+    {
+        perror("Could not create socket");
+    }
+
+    connection->address.sin_addr.s_addr = inet_addr(address);
+    connection->address.sin_family = AF_INET;
+    connection->address.sin_port = htons(atoi(port));
+
+    if (connect(connection->socket, (struct sockaddr *)&connection->address , sizeof(connection->address)) < 0)
+    {
+        perror("Connect failed.");
+        exit(1);
+    }
+
+    set_room(connection);
+
+    message msg;
+    ssize_t recv_val = recv(connection->socket, &msg, sizeof(message), 0);
+    if(recv_val < 0)
+    {
+        perror("recv failed");
+        exit(1);
+
+    }
+    else if(recv_val == 0)
+    {
+      close(connection->socket);
+      printf("The room \"%s\" is full, please try another room.\n", connection->room);
+      continue;
+    }
+
+    break;
+  }
 
   puts("Connected to server.");
   puts("Type /help for usage.");
@@ -225,6 +303,7 @@ void handle_user_input(connection_info *connection)
     message msg;
     msg.type = PUBLIC_MESSAGE;
     strncpy(msg.username, connection->username, 20);
+    strncpy(msg.room, connection->room, 20);
 
     if(strlen(input) == 0) {
         return;
@@ -266,7 +345,8 @@ void handle_server_message(connection_info *connection)
   {
 
     case CONNECT:
-      printf(KYEL "%s has connected." RESET "\n", msg.username);
+      if (strcmp(msg.room, connection->room) == 0)
+        printf(KYEL "%s has connected." RESET "\n", msg.username);
     break;
 
     case DISCONNECT:
@@ -278,7 +358,8 @@ void handle_server_message(connection_info *connection)
     break;
 
     case PUBLIC_MESSAGE:
-      printf(KGRN "%s" RESET ": %s\n", msg.username, msg.data);
+      if (strcmp(msg.room, connection->room) == 0)
+        printf(KGRN "%s" RESET ": %s\n", msg.username, msg.data);
     break;
 
     case PRIVATE_MESSAGE:
