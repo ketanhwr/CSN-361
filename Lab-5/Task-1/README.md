@@ -1,6 +1,6 @@
 ### Task
 
-Wria C program
+Write a C program
 
 - to find the host name from IP address.
 
